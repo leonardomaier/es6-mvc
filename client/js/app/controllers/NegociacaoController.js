@@ -25,7 +25,36 @@ class NegociacaoController {
 		this._listaNegociacoes.adiciona(this._criaNegociacao());
 		this._mensagem.texto = 'Negociação adicionada com sucesso!';
 		this._limpaFormulario();
+	}
 
+	importaNegociacoes() {
+
+
+
+		let xhr = new XMLHttpRequest();
+
+
+		xhr.open('GET', 'negociacoes/semana');
+
+		xhr.onreadystatechange = () => {
+
+			if (xhr.readyState == 4) {	
+
+				if (xhr.status == 200) {
+
+					JSON.parse(xhr.responseText)
+					.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor))
+					.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+				} else {
+
+					console.log('Não foi possível obter as negociações do servidor!');
+					console.log(xhr.responseText);
+				}
+			}
+		};
+
+
+		xhr.send();
 	}
 
 	apaga() {
