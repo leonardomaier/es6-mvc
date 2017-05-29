@@ -29,32 +29,63 @@ class NegociacaoController {
 
 	importaNegociacoes() {
 
+		let service = new NegociacaoService();
 
+		//Resolve o problema da ordem de execução das Promises
+		Promise.all([
+			service.obtemNegociacoesDaSemana(),
+			service.obtemNegociacoesDaSemanaAnterior(),
+			service.obtemNegociacoesDaSemanaRetrasada()]
+		).then(negociacoes => {
+			negociacoes
+				.reduce((arrayFlat, array) => arrayFlat.concat(array), [])
+				.forEach(negociacao => 	this._listaNegociacoes.adiciona(negociacao)); 
 
-		let xhr = new XMLHttpRequest();
+			this._mensagem.texto = 'Negociações importadas com sucesso';
+		}).catch(erro => this._mensagem.texto = erro);
 
+		/*
 
-		xhr.open('GET', 'negociacoes/semana');
+		Executam na ordem errada, pois o método é assíncrono
 
-		xhr.onreadystatechange = () => {
+		service.obtemNegociacoesDaSemana()
+			.then(negociacoes => {
+				negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+				this._mensagem.texto = 'Negociações da semana obtidas com sucesso!';
+			})
+			.catch(erro => this._mensagem.texto = erro);
 
-			if (xhr.readyState == 4) {	
+		service.obtemNegociacoesDaSemanaAnterior()
+			.then(negociacoes => {
+				negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+				this._mensagem.texto = 'Negociações da semana obtidas com sucesso!';
+			})
+			.catch(erro => this._mensagem.texto = erro);
 
-				if (xhr.status == 200) {
+		service.obtemNegociacoesDaSemanaRetrasada()
+			.then(negociacoes => {
+				negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+				this._mensagem.texto = 'Negociações da semana obtidas com sucesso!';
+			})
+			.catch(erro => this._mensagem.texto = erro);
+		*/
 
-					JSON.parse(xhr.responseText)
-					.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor))
-					.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
-				} else {
+		/*
 
-					console.log('Não foi possível obter as negociações do servidor!');
-					console.log(xhr.responseText);
-				}
+		service.obtemNegociacoes((err, negociacoes) => {
+
+			if (err) {
+				
+				this._mensagem.texto = 'Erro ao importar negociacoes';
+				return;
 			}
-		};
 
+			negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+			this._mensagem.texto = 'Negociações importadas com sucesso';
+		});
 
-		xhr.send();
+		*/
+
 	}
 
 	apaga() {
