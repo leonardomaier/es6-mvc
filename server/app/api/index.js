@@ -40,10 +40,10 @@ api.listaAnterior = function(req, res) {
 
 api.listaRetrasada = function(req, res) {
 
-   var negociacoesRtrasadas = negociacoes.filter(function(negociacao) {
+   var negociacoesRetrasadas = negociacoes.filter(function(negociacao) {
         return negociacao.data < dataAnterior;
     });
-    res.json(negociacoesRtrasadas);
+    res.json(negociacoesRetrasadas);
     
 };
 
